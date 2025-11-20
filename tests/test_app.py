@@ -1,4 +1,4 @@
-from app/predict import predict
+from app.predict import predict
 
 def test_predict_returns_valid_species():
     features = [5.1, 3.5, 1.4, 0.2]
