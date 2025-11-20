@@ -1,0 +1,42 @@
+# Virtual environments
+venv/
+.env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data and model checkpoints (if you train inside Docker)
+*.csv
+*.npy
+*.pkl
+
+# Logs and temporary files
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Git & IDE files
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Jupyter notebooks
+*.ipynb_checkpoints/
+
+# System files
+Thumbs.db
+
+# Docker artifacts
+Dockerfile*
+docker-compose.yml
+
