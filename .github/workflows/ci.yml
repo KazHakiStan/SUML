@@ -41,8 +41,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/${{ toLower(github.repository_owner) }}/suml-app:latest .
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t ghcr.io/$OWNER/suml-app:latest .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ toLower(github.repository_owner) }}/suml-app:latest
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          docker push ghcr.io/$OWNER/suml-app:latest
