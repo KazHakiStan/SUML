@@ -213,3 +213,7 @@ Include
 etc
 share
 pyvenv.cfg
+
+mlruns/
+artifacts/
+mlartifacts/

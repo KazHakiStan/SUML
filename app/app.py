@@ -1,5 +1,23 @@
+import json
+from pathlib import Path
+
 import streamlit as st
 from predict import predict
+
+
+def load_model_meta():
+    meta_path = Path(__file__).with_name("model_meta.json")
+    if not meta_path.exists():
+        return None
+
+    try:
+        with meta_path.open("r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return None
+
+
+model_meta = load_model_meta()
 
 st.sidebar.title("Navigation")
 page = st.sidebar.selectbox("Select a section", ["Home", "Predict", "About"])
@@ -15,10 +33,11 @@ if page == "Home":
         - **About tab** to learn how it works
         """)
     st.image(
-       "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Blue_Flag%2C_Ottawa.jpg/1024px-Blue_Flag%2C_Ottawa.jpg",
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Blue_Flag%2C_Ottawa.jpg/1024px-Blue_Flag%2C_Ottawa.jpg",
         caption="Example of an Iris flower",
-        use_container_width=True 
+        use_container_width=True
     )
+
 elif page == "Predict":
     st.title("Iris Species Prediction")
 
@@ -44,23 +63,50 @@ elif page == "Predict":
                 st.success(f"Predicted Iris Species: **{predicted_species}**")
 
     with tab2:
+        st.subheader("Model Info")
+
+        if model_meta is None:
+            st.warning(
+                "No `model_meta.json` found. "
+                "Run the training script to generate the model and metadata."
+            )
+            st.write("""
+            By default, the app expects a trained model and metadata file in the `app/` directory:
+            - `model.joblib` – serialized model  
+            - `model_meta.json` – information about the best model and its metrics
+            """)
+        else:
+            best_model = model_meta.get("best_model", "Unknown model")
+            metrics = model_meta.get("metrics", {})
+            accuracy = metrics.get("accuracy")
+            f1_macro = metrics.get("f1_macro")
+            version = model_meta.get("version", "N/A")
+            run_id = model_meta.get("mlflow_run_id", "N/A")
+
+            st.markdown(f"- **Best model:** `{best_model}`")
+            if accuracy is not None:
+                st.markdown(f"- **Accuracy:** `{accuracy:.4f}`")
+            if f1_macro is not None:
+                st.markdown(f"- **F1 (macro):** `{f1_macro:.4f}`")
+            st.markdown(f"- **App / model version:** `{version}`")
+            st.markdown(f"- **MLflow run id:** `{run_id}`")
+
+            with st.expander("Raw metadata (JSON)"):
+                st.json(model_meta)
+
+        st.markdown("---")
         st.write("""
-        **Model Info:**
-        - Algorithm: Random Forest Classifier  
-        - Input features: Sepal and Petal dimensions  
-        - Output: Predicted species — *Setosa*, *Versicolor*, or *Virginica*
+        The model uses the four numeric features of the Iris dataset:
+
+        - Sepal Length  
+        - Sepal Width  
+        - Petal Length  
+        - Petal Width  
+
+        These are fed into a trained machine learning model that outputs the most likely species
+        (*Setosa*, *Versicolor*, or *Virginica*).
         """)
 
-        with st.expander("See how prediction works"):
-            st.write("""
-            The model uses the four numeric features of the Iris dataset:
-            - Sepal Length  
-            - Sepal Width  
-            - Petal Length  
-            - Petal Width  
-
-            These are fed into a trained machine learning model that outputs the most likely species.
-            """)
 elif page == "About":
     st.title("About This App")
     st.write("""
@@ -71,4 +117,10 @@ elif page == "About":
     - **Expandable panels** for hidden details
     - **Sidebar navigation** for multi-page apps
     """)
+
+    if model_meta:
+        st.markdown("### Current model")
+        st.markdown(f"- Best model: `{model_meta.get('best_model', 'Unknown')}`")
+        st.markdown(f"- Version: `{model_meta.get('version', 'N/A')}`")
+
     st.write("Created using **Streamlit**.")
