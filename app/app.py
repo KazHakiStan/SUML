@@ -4,6 +4,7 @@ from pathlib import Path
 import streamlit as st
 from predict import predict
 
+MLFLOW_URL = "http://localhost:5000"
 
 def load_model_meta():
     meta_path = Path(__file__).with_name("model_meta.json")
@@ -95,6 +96,10 @@ elif page == "Predict":
                 st.json(model_meta)
 
         st.markdown("---")
+        st.markdown(
+            f"📊 **View MLflow experiment dashboard:** "
+            f"[Open MLflow UI]({MLFLOW_URL})"
+        )
         st.write("""
         The model uses the four numeric features of the Iris dataset:
 
